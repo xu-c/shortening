@@ -2,36 +2,26 @@
 Routes and views for the flask application.
 """
 
-from datetime import datetime
-from flask import render_template
+from flask import request
 from FlaskWebProject import app
+import urllib, urllib2, json
 
 @app.route('/')
-@app.route('/home')
-def home():
-    """Renders the home page."""
-    return render_template(
-        'index.html',
-        title='Home Page',
-        year=datetime.now().year,
-    )
+def shortening():
+    url = request.args.get('url')
+    if url:
+        api = 'http://dwz.cn/create.php'
+        data = {}
+        data['url'] = url
+        post_data = urllib.urlencode(data)
+        req = urllib2.Request(api, post_data)
+        res_data = urllib2.urlopen(req)
+        return_data = json.load(res_data)
 
-@app.route('/contact')
-def contact():
-    """Renders the contact page."""
-    return render_template(
-        'contact.html',
-        title='Contact',
-        year=datetime.now().year,
-        message='Your contact page.'
-    )
+        if return_data.has_key('tinyurl'):
+            return return_data['tinyurl']
+        else:
+            return str(return_data)
 
-@app.route('/about')
-def about():
-    """Renders the about page."""
-    return render_template(
-        'about.html',
-        title='About',
-        year=datetime.now().year,
-        message='Your application description page.'
-    )
+    else:
+        return 'Please visit /?url={url_long}'
