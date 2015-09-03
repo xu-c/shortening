@@ -6,20 +6,27 @@ from flask import request
 from FlaskWebProject import app
 import urllib, urllib2, json
 
+
+# API = 'http://dwz.cn/create.php'
+API = 'http://is.gd/create.php'
+ARG = 'url'
+# KEY = 'tinyurl'
+KEY = 'shorturl'
+
 @app.route('/')
 def shortening():
-    url = request.args.get('url')
+    url = request.values.get('url')
     if url:
-        api = 'http://dwz.cn/create.php'
         data = {}
-        data['url'] = url
+        data[ARG] = url
+        data['format'] = 'json'
         post_data = urllib.urlencode(data)
-        req = urllib2.Request(api, post_data)
+        req = urllib2.Request(API, post_data)
         res_data = urllib2.urlopen(req)
         return_data = json.load(res_data)
 
-        if return_data.has_key('tinyurl'):
-            return return_data['tinyurl']
+        if return_data.has_key(KEY):
+            return return_data[KEY]
         else:
             return str(return_data)
 
